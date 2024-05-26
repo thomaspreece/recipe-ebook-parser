@@ -8,13 +8,15 @@ from bs4 import BeautifulSoup
 import sqlite3
 from slugify import slugify
 import shutil 
+import string 
 
 parser_pon_comfort = {
     "combine_pages": False, 
+    "recase_title": True,
     "required": [
     ],
     "title_selector": {
-        "type": "h2",
+        "type": ["h2", "h3"],
         "attrs": {
             "class": "recipe_head"
         }
@@ -271,6 +273,9 @@ for html_section in html_sections:
         subsoup = BeautifulSoup(recipe_section, features="lxml")
         recipe_title_tag = subsoup.find(title_selector["type"], attrs=title_selector["attrs"])
         recipe_title = recipe_title_tag.text
+        if parser_settings["recase_title"]:
+            recipe_title = string.capwords(recipe_title)
+
         print(recipe_title)
         
         try:

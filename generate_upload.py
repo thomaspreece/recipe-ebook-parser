@@ -7,6 +7,7 @@ from datetime import datetime
 from slugify import slugify
 import unicodedata as ud
 from unicodedata import numeric
+import string 
 
 OUTPUT_LOCATION = "output"
 
@@ -36,7 +37,11 @@ valid_measurements = [
 ]
 
 def get_number(text):
-    return int(re.sub("[^0-9]*","", text))
+    number = re.sub("[^0-9]*","", text)
+    if len(number) > 0:
+        return int(number)
+    else:
+        return 0
 
 def get_vulgar_fraction_number(i):
     # samples = ["3¼","19¼","3 ¼","10"]
@@ -84,6 +89,9 @@ def parse_ingredient(ingredient):
         ingredient_splits.pop(0)
     
     parsed_ingredient["title"] = " ".join(ingredient_splits)
+
+    if len(parsed_ingredient["title"]) > 120:
+        parsed_ingredient["title"] = parsed_ingredient["title"][0:120] + "..."
     return parsed_ingredient
 
 print("------------------------")
@@ -145,7 +153,7 @@ for row in rows:
             "course": '',
             "cuisine": '',
             "directions": "\n\n".join(steps),
-            "info": "",
+            "info": description,
             "pub_date": date_time,
             "public": True,
             "servings": get_number(serves),
